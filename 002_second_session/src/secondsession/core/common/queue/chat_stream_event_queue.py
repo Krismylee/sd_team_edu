@@ -22,7 +22,7 @@ class ChatStreamEventQueue:
         self._redis = redis_client
         self._key_prefix = key_prefix
 
-    def push_event(self, job_id: str, event: dict) -> None:
+    async def push_event(self, job_id: str, event: dict) -> None:
         """이벤트를 큐에 적재한다.
 
         TODO:
@@ -36,7 +36,7 @@ class ChatStreamEventQueue:
         _ = json.dumps(event, ensure_ascii=False)
         raise NotImplementedError("스트리밍 이벤트 적재 로직을 구현해야 합니다.")
 
-    def pop_event(self, job_id: str) -> dict | None:
+    async def pop_event(self, job_id: str) -> dict | None:
         """이벤트를 큐에서 꺼낸다.
 
         TODO:

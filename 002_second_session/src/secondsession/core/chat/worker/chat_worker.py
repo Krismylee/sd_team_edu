@@ -1,20 +1,20 @@
 # 목적: 대화 워커 실행 흐름을 정의한다.
 # 설명: 큐 소비 → 그래프 실행 → 스트리밍 이벤트 적재를 담당한다.
-# 디자인 패턴: Worker, Producer-Consumer
+# 디자인 패턴: Worker, Producer-Consumer, Template Method(상속)
 # 참조: docs/02_backend_service_layer/05_비동기_엔드포인트_분리_전략.md
 
 """대화 워커 모듈."""
 
 from __future__ import annotations
 
-import time
 from typing import Any
 
-from secondsession.core.chat.graphs import build_chat_graph
+from secondsession.core.chat.graphs import ChatGraph
 from secondsession.core.common.queue import ChatJobQueue, ChatStreamEventQueue
+from secondsession.core.common.worker import WorkerBase
 
 
-class ChatWorker:
+class ChatWorker(WorkerBase):
     """대화 워커."""
 
     def __init__(
@@ -32,25 +32,14 @@ class ChatWorker:
             checkpointer: LangGraph 체크포인터.
             poll_interval: 큐 폴링 간격(초).
         """
+        super().__init__(poll_interval=poll_interval)
         self._job_queue = job_queue
         self._event_queue = event_queue
         self._checkpointer = checkpointer
-        self._poll_interval = poll_interval
 
-    def run_forever(self) -> None:
-        """워커를 루프 형태로 실행한다.
-
-        TODO:
-            - 큐에서 작업을 가져와 처리한다.
-            - 작업이 없으면 poll_interval 만큼 대기한다.
-            - 종료/취소 정책을 정의한다(취소 키 확인).
-        """
-        while True:
-            job = self._job_queue.dequeue()
-            if job is None:
-                time.sleep(self._poll_interval)
-                continue
-            self._process_job(job)
+    def _dequeue_job(self) -> dict | None:
+        """큐에서 작업을 꺼낸다."""
+        return self._job_queue.dequeue()
 
     def _process_job(self, job: dict) -> None:
         """단일 작업을 처리한다.
@@ -63,6 +52,6 @@ class ChatWorker:
             - error 발생 시 error → done 순서로 적재한다.
             - done 이벤트를 반드시 적재하고 종료한다.
         """
-        _ = build_chat_graph(self._checkpointer)
+        _ = ChatGraph(self._checkpointer)
         _ = job
         raise NotImplementedError("워커 실행 로직을 구현해야 합니다.")
