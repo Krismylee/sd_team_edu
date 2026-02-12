@@ -11,11 +11,19 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 class CallModelNode:
     """모델 호출을 담당하는 노드."""
-    llm = ChatGoogleGenerativeAI(
-            model="gemini-3-flash-preview",
-            temperature=0.3,
-        )
 
+    def run(self, prompt: str, temperature: float):
+        if not prompt:
+            raise ValueError("Prompt is empty.")
+        
+        llm = ChatGoogleGenerativeAI(
+            model = "gemini-3-flash-preview",
+            temperature = temperature
+        )
+        return llm.invoke(prompt)
+
+        
+    '''    
     def run(self, state: TranslationState) -> TranslationState:
         """프롬프트를 기반으로 번역 결과를 생성한다.
         Args:
@@ -23,8 +31,7 @@ class CallModelNode:
         Returns:
             TranslationState: 번역 결과가 포함된 상태.
         """
-        
         # TODO: 모델 호출 인터페이스와 에러 처리 규칙을 구현한다.
-        
         # TODO: 응답 텍스트 파싱 및 정규화 규칙을 정의한다.
-        raise NotImplementedError("모델 호출 로직을 구현해야 합니다.")
+        #raise NotImplementedError("모델 호출 로직을 구현해야 합니다.")
+    '''

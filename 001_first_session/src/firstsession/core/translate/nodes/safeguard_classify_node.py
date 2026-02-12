@@ -8,7 +8,9 @@
 from firstsession.core.translate.state.translation_state import TranslationState
 # 추가된 import
 from firstsession.core.translate.prompts.safeguard_prompt import SAFEGUARD_PROMPT
-from langchain_google_genai import ChatGoogleGenerativeAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
+from firstsession.core.translate.nodes.call_model_node import CallModelNode
+
 
 
 class SafeguardClassifyNode:
@@ -19,10 +21,10 @@ class SafeguardClassifyNode:
         "HARMFUL",
         "PROMPT_INJECTION"
     }
-    llm = ChatGoogleGenerativeAI(
-    model="gemini-3-flash-preview",  # 또는 gemini-1.5-pro
-    temperature=0
-    )
+    #llm = ChatGoogleGenerativeAI(
+    #model="gemini-3-flash-preview",  # 또는 gemini-1.5-pro
+    #temperature=0
+    #)
     def run(self, state: TranslationState) -> TranslationState:
         """입력에 대한 안전 라벨을 판정한다.
         Args:
@@ -33,7 +35,10 @@ class SafeguardClassifyNode:
         # TODO: 안전 분류 프롬프트를 호출하고 PASS/PII/HARMFUL/PROMPT_INJECTION을 산출한다.
         text = state.get("normalized_text", "")
         prompt = SAFEGUARD_PROMPT.format(user_input=text)
-        response = self.llm.invoke(prompt)
+        
+        self.call_model_node = CallModelNode()
+        response = self.call_model_node.run(prompt, 0.0)
+        #response = self.llm.invoke(prompt)
         
         # TODO: 출력 검증 및 정규화 규칙을 정의한다.
         '''

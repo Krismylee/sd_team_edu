@@ -7,16 +7,17 @@
 
 from firstsession.core.translate.state.translation_state import TranslationState
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+#from langchain_google_genai import ChatGoogleGenerativeAI
 from firstsession.core.translate.prompts.translation_prompt import TRANSLATION_PROMPT
+from firstsession.core.translate.nodes.call_model_node import CallModelNode
 
 
 class TranslateNode:
     """번역 수행을 담당하는 노드."""
-    llm = ChatGoogleGenerativeAI(
-    model="gemini-3-flash-preview",
-    temperature=0.3,  # 번역은 약간의 다양성 허용 가능
-    )
+    #llm = ChatGoogleGenerativeAI(
+    #model="gemini-3-flash-preview",
+    #temperature=0.3,  # 번역은 약간의 다양성 허용 가능
+    #)
 
 
     def run(self, state: TranslationState) -> TranslationState:
@@ -32,7 +33,11 @@ class TranslateNode:
         text = state.get("normalized_text", "")
         
         prompt = TRANSLATION_PROMPT.format(source_language=source, target_language=target, text=text)
-        response = self.llm.invoke(prompt)
+        
+        
+        self.call_model_node = CallModelNode()
+        response = self.call_model_node.run(prompt, 0.3)
+        #response = self.llm.invoke(prompt)
         translated = response.text.strip()
         
         state["translated_text"] = translated
