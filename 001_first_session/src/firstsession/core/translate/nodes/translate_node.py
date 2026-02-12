@@ -7,19 +7,36 @@
 
 from firstsession.core.translate.state.translation_state import TranslationState
 
+from langchain_google_genai import ChatGoogleGenerativeAI
+from firstsession.core.translate.prompts.translation_prompt import TRANSLATION_PROMPT
+
 
 class TranslateNode:
     """번역 수행을 담당하는 노드."""
+    llm = ChatGoogleGenerativeAI(
+    model="gemini-3-flash-preview",
+    temperature=0.3,  # 번역은 약간의 다양성 허용 가능
+    )
+
 
     def run(self, state: TranslationState) -> TranslationState:
         """번역 결과를 생성한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 번역 결과가 포함된 상태.
         """
         # TODO: 번역 프롬프트를 구성하고 모델/외부 API를 호출한다.
+        source = state.get("source_language", "")
+        target = state.get("target_language", "")
+        text = state.get("normalized_text", "")
+        
+        prompt = TRANSLATION_PROMPT.format(source_language=source, target_language=target, text=text)
+        response = self.llm.invoke(prompt)
+        translated = response.text.strip()
+        
+        state["translated_text"] = translated
+        return state
+        
         # TODO: 번역 결과를 상태에 기록하는 규칙을 정의한다.
         raise NotImplementedError("번역 수행 로직을 구현해야 합니다.")

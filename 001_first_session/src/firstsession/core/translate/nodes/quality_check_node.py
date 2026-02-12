@@ -7,19 +7,39 @@
 
 from firstsession.core.translate.state.translation_state import TranslationState
 
+from langchain_google_genai import ChatGoogleGenerativeAI
+from firstsession.core.translate.prompts.quality_check_prompt import QUALITY_CHECK_PROMPT
 
 class QualityCheckNode:
     """번역 품질 검사를 담당하는 노드."""
+    llm = ChatGoogleGenerativeAI(
+    model="gemini-3-flash-preview",
+    temperature=0.0,  # 판정은 deterministic하게
+    )
 
     def run(self, state: TranslationState) -> TranslationState:
         """번역 품질을 검사한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 품질 검사 결과가 포함된 상태.
         """
         # TODO: 품질 검사 프롬프트로 YES/NO를 판정한다.
+        source = state.get("normalized_text", "")
+        translated = state.get("translated_text", "")
+        if not source or not translated:
+            state["qc_passed"] = "NO"
+            return state
+        
+        prompt = QUALITY_CHECK_PROMPT.format(source_text=source, translated_text=translated)
+        response = self.llm.invoke(prompt)
+        result = response.text.strip().upper()
+        
         # TODO: 결과를 qc_passed 필드에 기록하는 규칙을 정의한다.
-        raise NotImplementedError("품질 검사 로직을 구현해야 합니다.")
+        if result == "YES":
+            state["qc_passed"] = "YES"
+        else:
+            state["qc_passed"] = "NO"
+            
+        return state
+        #raise NotImplementedError("품질 검사 로직을 구현해야 합니다.")

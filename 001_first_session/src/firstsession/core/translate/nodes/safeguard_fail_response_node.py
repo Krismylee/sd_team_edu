@@ -13,13 +13,16 @@ class SafeguardFailResponseNode:
 
     def run(self, state: TranslationState) -> TranslationState:
         """차단 응답을 구성한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 차단 응답이 포함된 상태.
         """
         # TODO: 차단 메시지를 응답 필드로 설정한다.
+        state["translated_text"] = ""
+        if not state.get("error"):
+            state["error"] = "요청이 정책에 의해 차단되었습니다."
         # TODO: 차단 사유 로깅 규칙을 정의한다.
-        raise NotImplementedError("안전 분류 실패 응답 로직을 구현해야 합니다.")
+        
+        return state
+        #raise NotImplementedError("안전 분류 실패 응답 로직을 구현해야 합니다.")

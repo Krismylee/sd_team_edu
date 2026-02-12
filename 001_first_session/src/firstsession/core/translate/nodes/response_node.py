@@ -13,13 +13,12 @@ class ResponseNode:
 
     def run(self, state: TranslationState) -> TranslationState:
         """최종 응답을 위한 상태를 정리한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 응답 구성이 완료된 상태.
         """
         # TODO: 최종 응답에 필요한 필드만 추려 상태를 정리한다.
         # TODO: 에러 메시지와 성공 응답의 우선순위를 정의한다.
-        raise NotImplementedError("응답 구성 로직을 구현해야 합니다.")
+        return state
+        #raise NotImplementedError("응답 구성 로직을 구현해야 합니다.")

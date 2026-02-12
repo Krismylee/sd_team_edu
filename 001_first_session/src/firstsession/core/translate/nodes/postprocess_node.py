@@ -13,10 +13,8 @@ class PostprocessNode:
 
     def run(self, state: TranslationState) -> TranslationState:
         """번역 결과를 검증하고 정리한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 후처리된 상태.
         """

@@ -15,11 +15,11 @@ class TranslationService:
 
     def __init__(self, graph: TranslateGraph) -> None:
         """서비스 의존성을 초기화한다.
-
         Args:
             graph: 번역 그래프 실행기.
         """
-        raise NotImplementedError("서비스 초기화 로직을 구현해야 합니다.")
+        self.graph = graph
+        #raise NotImplementedError("서비스 초기화 로직을 구현해야 합니다.")
 
     def translate(self, request: TranslationRequest) -> TranslationResponse:
         """번역 요청을 처리한다.
@@ -30,4 +30,9 @@ class TranslationService:
         Returns:
             TranslationResponse: 번역 결과 응답.
         """
-        raise NotImplementedError("번역 서비스 처리 로직을 구현해야 합니다.")
+        
+        response = self.graph.run(request)
+
+        #return TranslationResponse(**response)
+        return response
+        #raise NotImplementedError("번역 서비스 처리 로직을 구현해야 합니다.")

@@ -13,13 +13,26 @@ class RetryGateNode:
 
     def run(self, state: TranslationState) -> TranslationState:
         """재번역 가능 여부를 판단한다.
-
         Args:
             state: 현재 번역 상태.
-
         Returns:
             TranslationState: 게이트 판단 결과가 포함된 상태.
         """
         # TODO: retry_count와 max_retry_count 기준으로 재번역 여부를 판단한다.
+        qc_passed = state.get("qc_passed", "NO")
+        retry_count = state.get("retry_count", 0)
+        max_retry_count = state.get("max_retry_count", 0)
+        
+        if retry_count >= max_retry_count:
+            state["qc_passed"] = "YES"
+            return state
+        
+        if retry_count < max_retry_count:
+            state["qc_passed"] = "NO"
+        
         # TODO: qc_passed 결과에 따른 분기 규칙을 정의한다.
-        raise NotImplementedError("재번역 게이트 로직을 구현해야 합니다.")
+        if qc_passed == "YES":
+            return state
+        
+        return state
+        #raise NotImplementedError("재번역 게이트 로직을 구현해야 합니다.")
