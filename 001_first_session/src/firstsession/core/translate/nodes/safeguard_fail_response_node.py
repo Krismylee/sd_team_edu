@@ -22,6 +22,9 @@ class SafeguardFailResponseNode:
         state["translated_text"] = ""
         if not state.get("error"):
             state["error"] = "요청이 정책에 의해 차단되었습니다."
+        error_message = state.get("error", "")
+        state["translated_text"] = error_message
+        
         # TODO: 차단 사유 로깅 규칙을 정의한다.
         
         return state
